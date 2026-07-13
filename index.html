@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>Kanji TSV Reader</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <section class="panel top-panel">
+      <div class="header-grid">
+        <div class="header-copy">
+          <p class="eyebrow">Vanilla JavaScript PWA</p>
+          <h1>Kanji TSV Reader</h1>
+          <p class="subhead">Read a stored TSV, add a new TSV, and switch between browse and quiz modes.</p>
+        </div>
+
+        <div class="settings-stack">
+          <button id="settingsBtn" class="icon-button" type="button" aria-label="Settings">⚙</button>
+          <span class="settings-text">Settings</span>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="mode-wrap">
+          <span class="mode-label">Browse</span>
+          <label class="switch" aria-label="Browse or quiz mode">
+            <input id="modeToggle" type="checkbox" />
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+          </label>
+          <span class="mode-label">Quiz</span>
+        </div>
+
+        <label id="rangeWrap" class="select-wrap hidden">
+          <span>Quiz range</span>
+          <select id="rangeSelect"></select>
+        </label>
+
+        <div class="settings-wrap">
+          <button id="statsBtn" class="btn secondary stats-btn hidden" type="button">Statistics</button>
+          <label id="addTsvWrap" class="file-button hidden">
+            <input id="fileInput" type="file" accept=".tsv,.txt" />
+            <span>Add TSV</span>
+          </label>
+        </div>
+
+        <label class="select-wrap">
+          <span>Levels</span>
+          <select id="storedSelect"></select>
+        </label>
+      </div>
+
+      <div class="status-row">
+        <div id="fileStatus">No file loaded</div>
+        <div id="rowStatus">0 / 0</div>
+      </div>
+
+      <div id="errorBox" class="error hidden"></div>
+    </section>
+
+    <section id="studyCard" class="card kanji-card">
+      <div class="kanji-label">Current kanji</div>
+      <div id="kanji" class="kanji">—</div>
+
+      <div id="browseDetails" class="details hidden">
+        <div><span>Meaning</span><strong id="meaningValue"></strong></div>
+        <div><span>Example Word</span><strong id="exampleValue"></strong></div>
+        <div><span>Example Reading</span><strong id="exampleReadingValue"></strong></div>
+        <div><span>Example Meaning</span><strong id="exampleMeaningValue"></strong></div>
+      </div>
+
+      <div id="quizArea" class="quiz-area hidden">
+        <input
+          id="quizInput"
+          class="quiz-input"
+          type="text"
+          placeholder="Type the English meaning and press Enter"
+          autocomplete="off"
+          autocapitalize="off"
+          spellcheck="false"
+        />
+        <div id="quizFeedback" class="quiz-feedback" aria-live="polite"></div>
+
+        <div id="quizAnswer" class="quiz-answer hidden">
+          <div><span>Meaning</span><strong id="quizMeaningValue"></strong></div>
+          <div><span>Example Word</span><strong id="quizExampleValue"></strong></div>
+          <div><span>Example Reading</span><strong id="quizExampleReadingValue"></strong></div>
+          <div><span>Example Meaning</span><strong id="quizExampleMeaningValue"></strong></div>
+        </div>
+
+        <button id="continueQuizBtn" class="btn primary continue-btn hidden" type="button">Continue</button>
+        <button id="restartQuizBtn" class="btn secondary restart-btn hidden" type="button">Restart quiz</button>
+      </div>
+
+      <div id="quizCompletePanel" class="quiz-complete hidden">
+        <div class="quiz-complete-header">
+          <h2>Quiz complete</h2>
+          <p id="quizCompleteSummary"></p>
+        </div>
+        <div id="resultGrid" class="result-grid"></div>
+      </div>
+
+      <div id="statsPanel" class="quiz-complete hidden">
+        <div class="quiz-complete-header">
+          <h2>Statistics</h2>
+          <p id="statsSummary">All kanji in the current file.</p>
+        </div>
+        <div id="statsGrid" class="result-grid"></div>
+      </div>
+    </section>
+
+    <section id="navControls" class="controls">
+      <button id="prevBtn" class="btn secondary" disabled>Previous</button>
+      <button id="nextBtn" class="btn primary" disabled>Next</button>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

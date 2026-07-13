@@ -1,0 +1,19 @@
+{
+  "files": [
+    {
+      "name": "N5_v1.0.tsv",
+      "path": "data/N5_v1.0.tsv",
+      "label": "N5"
+    },
+    {
+      "name": "N4_v1.0.tsv",
+      "path": "data/N4_v1.0.tsv",
+      "label": "N4"
+    },
+    {
+      "name": "N3_v1.0.tsv",
+      "path": "data/N3_v1.0.tsv",
+      "label": "N3"
+    }
+  ]
+}
