@@ -30,6 +30,7 @@ const restartQuizBtn = document.getElementById('restartQuizBtn');
 const quizCompletePanel = document.getElementById('quizCompletePanel');
 const quizCompleteSummary = document.getElementById('quizCompleteSummary');
 const resultGrid = document.getElementById('resultGrid');
+const fireworksLayer = document.getElementById('fireworksLayer');
 const statsPanel = document.getElementById('statsPanel');
 const statsSummary = document.getElementById('statsSummary');
 const statsGrid = document.getElementById('statsGrid');
@@ -59,12 +60,14 @@ let currentFileStats = {};
 let index = 0;
 let customFiles = loadCustomFiles();
 let mode = localStorage.getItem(MODE_KEY) || 'browse';
-let quizLimit = parseInt(localStorage.getItem(QUIZ_RANGE_KEY) || '20', 10);
+let quizRange = loadQuizRange();
 let quizOrder = [];
 let quizCursor = 0;
 let quizResults = [];
-let quizState = { attempts: 0, revealed: false, complete: false };
+let quizState = { attempts: 0, revealed: false, complete: false, lastIncorrectGuess: '' };
 let showStatistics = false;
+let fireworksInstance = null;
+let fireworksCelebrated = false;
 let settingsOpen = localStorage.getItem(SETTINGS_OPEN_KEY) === '1';
 let presentedRecorded = false;
 
@@ -93,6 +96,32 @@ function saveCustomFiles(files) {
 
 function saveCurrentSelection(fileId) {
   localStorage.setItem(CURRENT_FILE_KEY, fileId);
+}
+
+function loadQuizRange() {
+  try {
+    const raw = localStorage.getItem(QUIZ_RANGE_KEY);
+    if (!raw) return { start: 0, end: 20 };
+    if (raw.includes(':')) {
+      const [startRaw, endRaw] = raw.split(':');
+      const start = parseInt(startRaw, 10);
+      const end = parseInt(endRaw, 10);
+      if (Number.isFinite(start) && Number.isFinite(end) && start >= 0 && end > start) {
+        return { start, end };
+      }
+    }
+    const legacyLimit = parseInt(raw, 10);
+    if (Number.isFinite(legacyLimit) && legacyLimit > 0) {
+      return { start: 0, end: legacyLimit };
+    }
+  } catch {
+    // fall through to default
+  }
+  return { start: 0, end: 20 };
+}
+
+function saveQuizRange(range) {
+  localStorage.setItem(QUIZ_RANGE_KEY, `${range.start}:${range.end}`);
 }
 
 function loadQuizStats() {
@@ -143,6 +172,28 @@ function getCurrentFileStats() {
   return allStats[currentFileStatsKey()] || {};
 }
 
+function buildQuizRangeOptions(maxCount) {
+  if (maxCount <= 0) {
+    return [{ start: 0, end: 20, label: '1-20' }];
+  }
+
+  if (maxCount <= 20) {
+    return [{ start: 0, end: maxCount, label: `1-${maxCount}` }];
+  }
+
+  const options = [];
+  for (let start = 0; start < maxCount; start += 20) {
+    const end = Math.min(start + 20, maxCount);
+    if (start === 0) {
+      options.push({ start: 0, end, label: `1-${end}` });
+    } else {
+      options.push({ start, end, label: `${start}-${end}` });
+      options.push({ start: 0, end, label: `1-${end}` });
+    }
+  }
+  return options;
+}
+
 function parseTsv(text) {
   const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n').filter((line) => line.trim().length > 0);
   if (!lines.length) throw new Error('The TSV file appears to be empty.');
@@ -185,22 +236,21 @@ function populateSelect() {
 
 function populateRangeSelect() {
   const maxCount = rows.length;
-  const options = [];
-  const upper = maxCount || 20;
-  for (let end = 20; end < upper; end += 20) options.push(end);
-  if (maxCount > 0) options.push(maxCount);
-  if (options.length === 0) options.push(20);
-  const unique = [...new Set(options)].sort((a, b) => a - b);
+  const options = buildQuizRangeOptions(maxCount);
   rangeSelect.innerHTML = '';
-  unique.forEach((end) => {
+
+  options.forEach((optionData) => {
     const option = document.createElement('option');
-    option.value = String(end);
-    option.textContent = `1-${end}`;
+    option.value = `${optionData.start}:${optionData.end}`;
+    option.textContent = optionData.label;
     rangeSelect.appendChild(option);
   });
-  if (!unique.includes(quizLimit)) quizLimit = unique[0];
-  rangeSelect.value = String(quizLimit);
-  localStorage.setItem(QUIZ_RANGE_KEY, String(quizLimit));
+
+  const currentValue = `${quizRange.start}:${quizRange.end}`;
+  const selected = options.find((optionData) => `${optionData.start}:${optionData.end}` === currentValue) || options[0];
+  quizRange = { start: selected.start, end: selected.end };
+  rangeSelect.value = `${quizRange.start}:${quizRange.end}`;
+  saveQuizRange(quizRange);
 }
 
 function syncModeUi() {
@@ -215,6 +265,8 @@ function setMode(nextMode) {
     buildQuizOrder();
   } else {
     showStatistics = false;
+    stopFireworks();
+    fireworksLayer?.classList?.add('hidden');
   }
   render();
   if (mode === 'quiz' && !showStatistics) {
@@ -269,16 +321,49 @@ function getCurrentRow() {
 }
 
 function resetQuestionState() {
-  quizState = { attempts: 0, revealed: false, complete: false };
+  quizState = { attempts: 0, revealed: false, complete: false, lastIncorrectGuess: '' };
   presentedRecorded = false;
 }
 
+function stopFireworks() {
+  if (fireworksInstance && typeof fireworksInstance.stop === 'function') {
+    fireworksInstance.stop();
+  }
+  fireworksInstance = null;
+}
+
+function startPerfectScoreFireworks() {
+  if (fireworksCelebrated || !fireworksLayer || typeof window === 'undefined') return;
+  const FireworksCtor = window.Fireworks?.default || window.Fireworks;
+  if (typeof FireworksCtor !== 'function') return;
+
+  stopFireworks();
+  fireworksLayer.classList.remove('hidden');
+  try {
+    fireworksInstance = new FireworksCtor(fireworksLayer);
+    if (typeof fireworksInstance.start === 'function') {
+      fireworksInstance.start();
+    }
+    fireworksCelebrated = true;
+    window.setTimeout(() => {
+      stopFireworks();
+      fireworksLayer.classList.add('hidden');
+    }, 3500);
+  } catch {
+    fireworksLayer.classList.add('hidden');
+    fireworksCelebrated = false;
+    stopFireworks();
+  }
+}
+
 function buildQuizOrder() {
-  const limit = Math.min(quizLimit, rows.length);
-  quizOrder = shuffle(Array.from({ length: limit }, (_, i) => i));
+  const start = Math.max(0, Math.min(quizRange.start, rows.length));
+  const end = Math.max(start, Math.min(quizRange.end, rows.length));
+  quizOrder = shuffle(Array.from({ length: end - start }, (_, i) => start + i));
   quizCursor = 0;
   quizResults = [];
   showStatistics = false;
+  fireworksCelebrated = false;
   statsBtn.textContent = 'Statistics';
   resetQuestionState();
 }
@@ -302,6 +387,8 @@ function setQuizVisual(state) {
 }
 
 function hideQuizPanels() {
+  stopFireworks();
+  fireworksLayer?.classList?.add('hidden');
   quizCompletePanel.classList.add('hidden');
   statsPanel.classList.add('hidden');
   quizArea.classList.add('hidden');
@@ -319,6 +406,8 @@ function renderBrowse() {
   setQuizVisual(null);
   quizFeedback.textContent = '';
   quizInput.value = '';
+  stopFireworks();
+  fireworksLayer?.classList?.add('hidden');
   quizInput.classList.remove('hidden');
   continueQuizBtn.classList.add('hidden');
   restartQuizBtn.classList.add('hidden');
@@ -342,6 +431,8 @@ function renderQuizQuestion() {
   const row = currentQuizRow();
   if (!row) return;
 
+  stopFireworks();
+  fireworksLayer?.classList?.add('hidden');
   quizArea.classList.remove('hidden');
   quizInput.classList.remove('hidden');
   quizFeedback.classList.remove('hidden');
@@ -410,6 +501,14 @@ function renderQuizComplete() {
     item.appendChild(bottom);
     resultGrid.appendChild(item);
   });
+
+  if (wrongCount === 0 && total > 0) {
+    startPerfectScoreFireworks();
+  } else {
+    stopFireworks();
+    fireworksLayer?.classList?.add('hidden');
+  }
+
   setQuizVisual('correct');
 }
 
@@ -427,6 +526,8 @@ function renderStatistics() {
   quizCompletePanel.classList.add('hidden');
   statsPanel.classList.remove('hidden');
   browseDetails.classList.add('hidden');
+  stopFireworks();
+  fireworksLayer?.classList?.add('hidden');
   clearQuizReadings();
   navControls.classList.add('hidden');
   kanjiEl.textContent = 'Statistics';
@@ -451,6 +552,8 @@ function renderStatistics() {
 function renderQuiz() {
   const hasRows = rows.length > 0;
   if (!hasRows) {
+    stopFireworks();
+    fireworksLayer?.classList?.add('hidden');
     quizArea.classList.add('hidden');
     browseDetails.classList.add('hidden');
     quizCompletePanel.classList.add('hidden');
@@ -505,6 +608,9 @@ function loadCurrentFile(fileId, persist = true) {
   currentSource = selected.id;
   currentLabel = selected.source === 'builtin' ? `Stored file: ${selected.label}` : `Added file: ${selected.name}`;
   showStatistics = false;
+  fireworksCelebrated = false;
+  stopFireworks();
+  fireworksLayer?.classList?.add('hidden');
   statsBtn.textContent = 'Statistics';
 
   const loadText = selected.source === 'builtin'
@@ -534,7 +640,7 @@ function loadCurrentFile(fileId, persist = true) {
 function advanceQuiz() {
   if (quizCursor < quizOrder.length - 1) {
     quizCursor += 1;
-    quizState = { attempts: 0, revealed: false, complete: false };
+    quizState = { attempts: 0, revealed: false, complete: false, lastIncorrectGuess: '' };
     presentedRecorded = false;
     quizInput.value = '';
     quizAnswer.classList.add('hidden');
@@ -544,7 +650,7 @@ function advanceQuiz() {
     quizInput.focus();
   } else {
     quizCursor = quizOrder.length;
-    quizState = { attempts: 0, revealed: false, complete: true };
+    quizState = { attempts: 0, revealed: false, complete: true, lastIncorrectGuess: '' };
     quizInput.value = '';
     render();
   }
@@ -561,6 +667,7 @@ function answerCorrect() {
   if (!row) return;
   incrementCorrect(row[0]);
   registerQuizResult(true);
+  quizInput.value = '';
   setQuizVisual('correct');
   quizFeedback.textContent = 'Correct';
   quizAnswer.classList.add('hidden');
@@ -575,6 +682,7 @@ function revealAnswer() {
   incrementIncorrect(row[0]);
   registerQuizResult(false);
   quizState.revealed = true;
+  quizInput.value = '';
   quizAnswer.classList.remove('hidden');
   quizMeaningValue.textContent = row[2] || '';
   quizExampleValue.textContent = row[5] || '';
@@ -583,14 +691,16 @@ function revealAnswer() {
   continueQuizBtn.classList.remove('hidden');
   restartQuizBtn.classList.remove('hidden');
   setQuizVisual('wrong');
-  quizFeedback.textContent = 'Answer shown';
+  const wrongGuess = quizState.lastIncorrectGuess ? `Sorry, not '${quizState.lastIncorrectGuess}'. ` : '';
+  quizFeedback.textContent = `${wrongGuess}Answer shown`;
 }
 
 function checkQuizAnswer() {
   const row = currentQuizRow();
   if (!row || quizState.complete) return;
 
-  const guess = normalizeAnswer(quizInput.value);
+  const typedAnswer = quizInput.value.trim();
+  const guess = normalizeAnswer(typedAnswer);
   const answers = acceptedAnswers(row[2] || '');
 
   if (answers.includes(guess)) {
@@ -599,12 +709,18 @@ function checkQuizAnswer() {
   }
 
   quizState.attempts += 1;
+  quizState.lastIncorrectGuess = typedAnswer;
+  quizInput.value = '';
+
   if (quizState.attempts >= 3) {
     revealAnswer();
     return;
   }
+
   setQuizVisual('wrong');
-  quizFeedback.textContent = `Try again (${quizState.attempts}/3)`;
+  const wrongGuess = typedAnswer ? `Sorry, not '${typedAnswer}'. ` : 'Sorry, not that answer. ';
+  quizFeedback.textContent = `${wrongGuess}Try again (${quizState.attempts}/3)`;
+  quizInput.focus();
 }
 
 function restartQuiz() {
@@ -683,6 +799,9 @@ function handleFileUpload(file) {
     currentSource = customId;
     currentLabel = `Added file: ${file.name}`;
     showStatistics = false;
+    fireworksCelebrated = false;
+    stopFireworks();
+    fireworksLayer?.classList?.add('hidden');
     statsBtn.textContent = 'Statistics';
     saveCurrentSelection(customId);
     populateSelect();
@@ -704,8 +823,13 @@ statsBtn.addEventListener('click', toggleStatistics);
 modeToggle.addEventListener('change', () => setMode(modeToggle.checked ? 'quiz' : 'browse'));
 storedSelect.addEventListener('change', (e) => loadCurrentFile(e.target.value, true));
 rangeSelect.addEventListener('change', () => {
-  quizLimit = parseInt(rangeSelect.value, 10) || 20;
-  localStorage.setItem(QUIZ_RANGE_KEY, String(quizLimit));
+  const [startRaw, endRaw] = rangeSelect.value.split(':');
+  const start = parseInt(startRaw, 10);
+  const end = parseInt(endRaw, 10);
+  if (Number.isFinite(start) && Number.isFinite(end) && end > start) {
+    quizRange = { start, end };
+    saveQuizRange(quizRange);
+  }
   if (mode === 'quiz') buildQuizOrder();
   render();
 });

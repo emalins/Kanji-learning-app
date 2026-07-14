@@ -325,11 +325,26 @@ h1{
 }
 
 .quiz-complete{
+  position:relative;
+  overflow:hidden;
   margin-top:18px;
   padding:16px;
   border-radius:22px;
   background:rgba(255,255,255,.76);
   border:1px solid var(--border);
+}
+
+.fireworks-layer{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+}
+
+.quiz-complete-header,
+.result-grid{
+  position:relative;
+  z-index:1;
 }
 .quiz-complete-header h2{
   margin:0 0 6px;
