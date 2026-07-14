@@ -1,0 +1,123 @@
+ID	Kanji	Meaning	OnReadings	KunReadings	ExampleWord	ExampleReading	ExampleMeaning	JLPT	Grade	StrokeCount	Radical	RadicalName	FrequencyRank	Tags
+N5-001	一	one	イチ	ひと	一人	一人[ひとり]	one person	N5	1					beginner
+N5-002	二	two	ニ	ふた	二日	二日[ふつか]	two days; second day	N5	1					beginner
+N5-003	三	three	サン	み	三人	三人[さんにん]	three people	N5	1					beginner
+N5-004	四	four	シ	よ、よん	四月	四月[しがつ]	April	N5	1					beginner
+N5-005	五	five	ゴ	いつ	五日	五日[いつか]	fifth day	N5	1					beginner
+N5-006	六	six	ロク	む	六日	六日[むいか]	sixth day	N5	1					beginner
+N5-007	七	seven	シチ	なな	七日	七日[なのか]	seventh day	N5	1					beginner
+N5-008	八	eight	ハチ	や	八日	八日[ようか]	eighth day	N5	1					beginner
+N5-009	九	nine	キュウ、ク	ここの	九日	九日[ここのか]	ninth day	N5	1					beginner
+N5-010	十	ten	ジュウ	とお	十日	十日[とおか]	tenth day	N5	1					beginner
+N5-011	百	hundred	ヒャク		百円	百円[ひゃくえん]	100 yen	N5	1					beginner
+N5-012	千	thousand	セン		千円	千円[せんえん]	1,000 yen	N5	1					beginner
+N5-013	万	ten thousand	マン、バン		一万円	一万円[いちまんえん]	10,000 yen	N5	1					beginner
+N5-014	円	yen	エン		百円	百円[ひゃくえん]	100 yen	N5	1					beginner
+N5-015	日	day; sun	ニチ、ジツ	ひ、か	今日	今日[きょう]	today	N5	1					beginner
+N5-016	月	month; moon	ゲツ、ガツ	つき	月曜日	月曜日[げつようび]	Monday	N5	1					beginner
+N5-017	火	fire	カ	ひ	火曜日	火曜日[かようび]	Tuesday	N5	1					beginner
+N5-018	水	water	スイ	みず	水	水[みず]	water	N5	1					beginner
+N5-019	木	tree	ボク、モク	き	木	木[き]	tree	N5	1					beginner
+N5-020	金	gold; money	キン、コン	かね	金曜日	金曜日[きんようび]	Friday	N5	1					beginner
+N5-021	土	earth; soil	ド、ト	つち	土曜日	土曜日[どようび]	Saturday	N5	1					beginner
+N5-022	年	year	ネン	とし	今年	今年[ことし]	this year	N5	1					beginner
+N5-023	時	time; hour	ジ	とき	時間	時間[じかん]	time	N5	1					beginner
+N5-024	分	minute; part	ブン、フン、ブ	わ.ける	五分	五分[ごふん]	five minutes	N5	1					beginner
+N5-025	半	half	ハン	なか.ば	半分	半分[はんぶん]	half	N5	1					beginner
+N5-026	今	now	コン	いま	今日	今日[きょう]	today	N5	1					beginner
+N5-027	先	before; ahead	セン	さき	先生	先生[せんせい]	teacher	N5	1					beginner
+N5-028	毎	every	マイ		毎日	毎日[まいにち]	every day	N5	1					beginner
+N5-029	週	week	シュウ		来週	来週[らいしゅう]	next week	N5	1					beginner
+N5-030	曜	day of week	ヨウ		月曜日	月曜日[げつようび]	Monday	N5	1					beginner
+N5-031	午	noon	ゴ		午後	午後[ごご]	afternoon; p.m.	N5	1					beginner
+N5-032	前	front; before	ゼン	まえ	前	前[まえ]	front; before	N5	1					beginner
+N5-033	後	after; behind	ゴ、コウ	あと、うし.ろ	後	後[あと]	after; behind	N5	1					beginner
+N5-034	朝	morning	チョウ	あさ	朝	朝[あさ]	morning	N5	1					beginner
+N5-035	昼	daytime; noon	チュウ	ひる	昼	昼[ひる]	daytime; noon	N5	1					beginner
+N5-036	夜	night	ヤ	よる	夜	夜[よる]	night	N5	1					beginner
+N5-037	夕	evening	ユウ	ゆう	夕方	夕方[ゆうがた]	evening	N5	1					beginner
+N5-038	天	heaven; sky	テン	あま、あめ	天気	天気[てんき]	weather	N5	1					beginner
+N5-039	気	spirit; energy	キ、ケ		元気	元気[げんき]	healthy; energetic	N5	1					beginner
+N5-040	雨	rain	ウ	あめ	雨	雨[あめ]	rain	N5	1					beginner
+N5-041	雪	snow	セツ	ゆき	雪	雪[ゆき]	snow	N5	1					beginner
+N5-042	風	wind	フウ、フ	かぜ	風	風[かぜ]	wind	N5	1					beginner
+N5-043	空	sky; empty	クウ	そら	空	空[そら]	sky	N5	1					beginner
+N5-044	山	mountain	サン	やま	山	山[やま]	mountain	N5	1					beginner
+N5-045	川	river	セン	かわ	川	川[かわ]	river	N5	1					beginner
+N5-046	田	rice field	デン	た	田	田[た]	rice field	N5	1					beginner
+N5-047	森	forest	シン	もり	森	森[もり]	forest	N5	1					beginner
+N5-048	林	woods; grove	リン	はやし	林	林[はやし]	woods; grove	N5	1					beginner
+N5-049	花	flower	カ	はな	花	花[はな]	flower	N5	1					beginner
+N5-050	草	grass	ソウ	くさ	草	草[くさ]	grass	N5	1					beginner
+N5-051	石	stone	セキ、シャク	いし	石	石[いし]	stone	N5	1					beginner
+N5-052	虫	insect	チュウ	むし	虫	虫[むし]	insect	N5	1					beginner
+N5-053	犬	dog	ケン	いぬ	犬	犬[いぬ]	dog	N5	1					beginner
+N5-054	魚	fish	ギョ	さかな	魚	魚[さかな]	fish	N5	1					beginner
+N5-055	鳥	bird	チョウ	とり	鳥	鳥[とり]	bird	N5	1					beginner
+N5-056	米	rice	ベイ、マイ	こめ	米	米[こめ]	rice	N5	1					beginner
+N5-057	牛	cow	ギュウ	うし	牛	牛[うし]	cow	N5	1					beginner
+N5-058	馬	horse	バ	うま	馬	馬[うま]	horse	N5	1					beginner
+N5-059	玉	jewel; ball	ギョク	たま	玉	玉[たま]	jewel; ball	N5	1					beginner
+N5-060	王	king	オウ		王	王[おう]	king	N5	1					beginner
+N5-061	門	gate	モン	かど	門	門[もん]	gate	N5	1					beginner
+N5-062	車	car	シャ	くるま	車	車[くるま]	car	N5	1					beginner
+N5-063	電	electricity	デン		電車	電車[でんしゃ]	train	N5	1					beginner
+N5-064	道	road; way	ドウ	みち	道	道[みち]	road; way	N5	1					beginner
+N5-065	駅	station	エキ		駅	駅[えき]	station	N5	1					beginner
+N5-066	店	shop	テン	みせ	店	店[みせ]	shop	N5	1					beginner
+N5-067	国	country	コク	くに	国	国[くに]	country	N5	1					beginner
+N5-068	町	town	チョウ	まち	町	町[まち]	town	N5	1					beginner
+N5-069	村	village	ソン	むら	村	村[むら]	village	N5	1					beginner
+N5-070	京	capital	キョウ、ケイ		東京	東京[とうきょう]	Tokyo	N5	1					beginner
+N5-071	校	school	コウ		学校	学校[がっこう]	school	N5	1					beginner
+N5-072	社	company; shrine	シャ		会社	会社[かいしゃ]	company	N5	1					beginner
+N5-073	会	meet; meeting	カイ、エ	あ.う	会う	会う[あう]	to meet	N5	1					beginner
+N5-074	家	house; family	カ、ケ	いえ	家	家[いえ]	house	N5	1					beginner
+N5-075	室	room	シツ	むろ	部屋	部屋[へや]	room	N5	1					beginner
+N5-076	親	parent	シン	おや	親	親[おや]	parent	N5	1					beginner
+N5-077	父	father	フ	ちち	父	父[ちち]	father	N5	1					beginner
+N5-078	母	mother	ボ	はは	母	母[はは]	mother	N5	1					beginner
+N5-079	兄	older brother	ケイ、キョウ	あに	兄	兄[あに]	older brother	N5	1					beginner
+N5-080	姉	older sister	シ	あね	姉	姉[あね]	older sister	N5	1					beginner
+N5-081	弟	younger brother	テイ、ダイ、デ	おとうと	弟	弟[おとうと]	younger brother	N5	1					beginner
+N5-082	妹	younger sister	マイ	いもうと	妹	妹[いもうと]	younger sister	N5	1					beginner
+N5-083	子	child	シ、ス	こ	子ども	子ども[こども]	child	N5	1					beginner
+N5-084	人	person	ジン、ニン	ひと	人	人[ひと]	person	N5	1					beginner
+N5-085	女	woman	ジョ、ニョ	おんな	女	女[おんな]	woman	N5	1					beginner
+N5-086	男	man	ダン、ナン	おとこ	男	男[おとこ]	man	N5	1					beginner
+N5-087	友	friend	ユウ	とも	友だち	友だち[ともだち]	friend	N5	1					beginner
+N5-088	名	name	メイ、ミョウ	な	名前	名前[なまえ]	name	N5	1					beginner
+N5-089	生	life; birth	セイ、ショウ	い.きる、う.まれる	先生	先生[せんせい]	teacher	N5	1					beginner
+N5-090	学	study	ガク	まな.ぶ	学生	学生[がくせい]	student	N5	1					beginner
+N5-091	文	sentence; writing	ブン、モン	ふみ	作文	作文[さくぶん]	composition	N5	1					beginner
+N5-092	字	character	ジ	あざ	漢字	漢字[かんじ]	kanji	N5	1					beginner
+N5-093	語	language	ゴ	かた.る	日本語	日本語[にほんご]	Japanese language	N5	1					beginner
+N5-094	話	talk; story	ワ	はな.す、はなし	話す	話す[はなす]	to speak	N5	1					beginner
+N5-095	読	read	ドク	よ.む	読む	読む[よむ]	to read	N5	1					beginner
+N5-096	書	write	ショ	か.く	書く	書く[かく]	to write	N5	1					beginner
+N5-097	聞	hear; ask	ブン、モン	き.く	聞く	聞く[きく]	to hear; to ask	N5	1					beginner
+N5-098	見	see	ケン	み.る	見る	見る[みる]	to see	N5	1					beginner
+N5-099	行	go	コウ、ギョウ	い.く	行く	行く[いく]	to go	N5	1					beginner
+N5-100	来	come	ライ	く.る	来る	来る[くる]	to come	N5	1					beginner
+N5-101	帰	return	キ	かえ.る	帰る	帰る[かえる]	to return	N5	1					beginner
+N5-102	入	enter	ニュウ	はい.る	入る	入る[はいる]	to enter	N5	1					beginner
+N5-103	出	exit; leave	シュツ、スイ	で.る	出る	出る[でる]	to leave	N5	1					beginner
+N5-104	休	rest	キュウ	やす.む	休む	休む[やすむ]	to rest	N5	1					beginner
+N5-105	立	stand	リツ	た.つ	立つ	立つ[たつ]	to stand	N5	1					beginner
+N5-106	使	use	シ	つか.う	使う	使う[つかう]	to use	N5	1					beginner
+N5-107	知	know	チ	し.る	知る	知る[しる]	to know	N5	1					beginner
+N5-108	思	think	シ	おも.う	思う	思う[おもう]	to think	N5	1					beginner
+N5-109	持	hold	ジ	も.つ	持つ	持つ[もつ]	to hold	N5	1					beginner
+N5-110	着	wear; arrive	チャク、ジャク	き.る	着る	着る[きる]	to wear	N5	1					beginner
+N5-111	売	sell	バイ	う.る	売る	売る[うる]	to sell	N5	1					beginner
+N5-112	買	buy	バイ	か.う	買う	買う[かう]	to buy	N5	1					beginner
+N5-113	貸	lend	タイ	か.す	貸す	貸す[かす]	to lend	N5	1					beginner
+N5-114	借	borrow	シャク	か.りる	借りる	借りる[かりる]	to borrow	N5	1					beginner
+N5-115	住	live	ジュウ	す.む	住む	住む[すむ]	to live	N5	1					beginner
+N5-116	食	eat	ショク、ジキ	た.べる	食べる	食べる[たべる]	to eat	N5	1					beginner
+N5-117	飲	drink	イン	の.む	飲む	飲む[のむ]	to drink	N5	1					beginner
+N5-118	乗	ride	ジョウ	の.る	乗る	乗る[のる]	to ride	N5	1					beginner
+N5-119	降	get off; fall	コウ	お.りる	降りる	降りる[おりる]	to get off	N5	1					beginner
+N5-120	切	cut	セツ	き.る	切る	切る[きる]	to cut	N5	1					beginner
+N5-121	開	open	カイ	あ.ける	開く	開く[あく]	to open	N5	1					beginner
+N5-122	取	take	シュ	と.る	取る	取る[とる]	to take	N5	1					beginner
