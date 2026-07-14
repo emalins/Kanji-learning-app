@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kanji-tsv-reader-v13';
+const CACHE_NAME = 'kanji-tsv-reader-v14';
 const ASSETS = [
   './',
   './index.html',

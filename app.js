@@ -11,7 +11,7 @@ const rowStatus = document.getElementById('rowStatus');
 const errorBox = document.getElementById('errorBox');
 const studyCard = document.getElementById('studyCard');
 const kanjiEl = document.getElementById('kanji');
-const kanjiReadingsEl = document.getElementById('kanjiReadings');
+const quizReadings = document.getElementById('quizReadings');
 const browseDetails = document.getElementById('browseDetails');
 const meaningValue = document.getElementById('meaningValue');
 const exampleValue = document.getElementById('exampleValue');
@@ -231,14 +231,28 @@ function acceptedAnswers(meaningText) {
   return meaningText.split(';').map((part) => normalizeAnswer(part)).filter(Boolean);
 }
 
+function formatQuizReadings(row) {
+  if (!row) return '';
+  const onReading = (row[3] || '').trim();
+  const kunReading = (row[4] || '').trim();
+  const readings = [onReading, kunReading].filter(Boolean);
+  return readings.length ? `(${readings.join(', ')})` : '';
+}
 
-function formatReadings(row) {
-  const on = (row?.[3] || '').trim();
-  const kun = (row?.[4] || '').trim();
-  const parts = [];
-  if (on) parts.push(`On: ${on}`);
-  if (kun) parts.push(`Kun: ${kun}`);
-  return parts.join('  •  ');
+function setQuizReadings(row) {
+  const text = formatQuizReadings(row);
+  if (!text) {
+    quizReadings.textContent = '';
+    quizReadings.classList.add('hidden');
+    return;
+  }
+  quizReadings.textContent = text;
+  quizReadings.classList.remove('hidden');
+}
+
+function clearQuizReadings() {
+  quizReadings.textContent = '';
+  quizReadings.classList.add('hidden');
 }
 
 function shuffle(array) {
@@ -252,14 +266,6 @@ function shuffle(array) {
 
 function getCurrentRow() {
   return rows[quizOrder[quizCursor]] || null;
-}
-
-
-function setQuizKanjiDisplay(row, showReadings = true) {
-  kanjiEl.textContent = row?.[1] || '—';
-  const readings = showReadings ? formatReadings(row) : '';
-  kanjiReadingsEl.textContent = readings;
-  kanjiReadingsEl.classList.toggle('hidden', !readings);
 }
 
 function resetQuestionState() {
@@ -299,6 +305,7 @@ function hideQuizPanels() {
   quizCompletePanel.classList.add('hidden');
   statsPanel.classList.add('hidden');
   quizArea.classList.add('hidden');
+  clearQuizReadings();
 }
 
 function renderBrowse() {
@@ -315,10 +322,9 @@ function renderBrowse() {
   quizInput.classList.remove('hidden');
   continueQuizBtn.classList.add('hidden');
   restartQuizBtn.classList.add('hidden');
+  clearQuizReadings();
 
   kanjiEl.textContent = hasRows ? (row[1] || '—') : '—';
-  kanjiReadingsEl.textContent = '';
-  kanjiReadingsEl.classList.add('hidden');
   if (hasRows) {
     meaningValue.textContent = row[2] || '';
     exampleValue.textContent = row[5] || '';
@@ -345,9 +351,9 @@ function renderQuizQuestion() {
   statsPanel.classList.add('hidden');
 
   if (!presentedRecorded) recordPresentedForCurrentQuestion();
-  kanjiReadingsEl.classList.remove('hidden');
 
-  setQuizKanjiDisplay(row, true);
+  kanjiEl.textContent = row[1] || '—';
+  setQuizReadings(row);
   quizInput.value = quizInput.value; // no-op, keeps value
   continueQuizBtn.classList.add('hidden');
   restartQuizBtn.classList.add('hidden');
@@ -381,16 +387,13 @@ function renderQuizComplete() {
   quizInput.classList.add('hidden');
   quizAnswer.classList.add('hidden');
   continueQuizBtn.classList.add('hidden');
-  kanjiReadingsEl.textContent = '';
-  kanjiReadingsEl.classList.add('hidden');
   restartQuizBtn.classList.remove('hidden');
   quizCompletePanel.classList.remove('hidden');
   statsPanel.classList.add('hidden');
   browseDetails.classList.add('hidden');
+  clearQuizReadings();
   navControls.classList.add('hidden');
   kanjiEl.textContent = 'Done';
-  kanjiReadingsEl.textContent = '';
-  kanjiReadingsEl.classList.add('hidden');
   quizFeedback.textContent = `Quiz complete: ${correctCount} correct, ${wrongCount} incorrect`;
   quizCompleteSummary.textContent = `You tested ${total} kanji. ${correctCount} correct, ${wrongCount} incorrect.`;
 
@@ -424,10 +427,9 @@ function renderStatistics() {
   quizCompletePanel.classList.add('hidden');
   statsPanel.classList.remove('hidden');
   browseDetails.classList.add('hidden');
+  clearQuizReadings();
   navControls.classList.add('hidden');
   kanjiEl.textContent = 'Statistics';
-  kanjiReadingsEl.textContent = '';
-  kanjiReadingsEl.classList.add('hidden');
   statsSummary.textContent = `Presented ${totalPresented}, correct ${totalCorrect}, incorrect ${totalIncorrect}.`;
 
   statsGrid.innerHTML = '';
@@ -450,11 +452,11 @@ function renderQuiz() {
   const hasRows = rows.length > 0;
   if (!hasRows) {
     quizArea.classList.add('hidden');
-    kanjiReadingsEl.classList.add('hidden');
     browseDetails.classList.add('hidden');
     quizCompletePanel.classList.add('hidden');
     statsPanel.classList.add('hidden');
     navControls.classList.add('hidden');
+    clearQuizReadings();
     kanjiEl.textContent = '—';
     return;
   }
@@ -573,7 +575,6 @@ function revealAnswer() {
   incrementIncorrect(row[0]);
   registerQuizResult(false);
   quizState.revealed = true;
-  quizInput.value = '';
   quizAnswer.classList.remove('hidden');
   quizMeaningValue.textContent = row[2] || '';
   quizExampleValue.textContent = row[5] || '';
@@ -598,7 +599,6 @@ function checkQuizAnswer() {
   }
 
   quizState.attempts += 1;
-  quizInput.value = '';
   if (quizState.attempts >= 3) {
     revealAnswer();
     return;
