@@ -36,3 +36,9 @@ python3 -m http.server 8000
 Then open:
 
 `http://localhost:8000/`
+
+
+## Quiz updates
+
+- The answer box now clears after each incorrect attempt.
+- Quiz mode shows On and Kun readings beneath the kanji in small text.
