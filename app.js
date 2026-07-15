@@ -383,7 +383,13 @@ function stopFireworks() {
 function startPerfectScoreFireworks() {
   if (fireworksCelebrated || !fireworksLayer || typeof window === 'undefined') return;
   const FireworksCtor = window.Fireworks?.default || window.Fireworks;
-  if (typeof FireworksCtor !== 'function') return;
+  if (typeof FireworksCtor !== 'function') {
+    fireworksCelebrated = true;
+    window.setTimeout(() => {
+      fireworksLayer.classList.add('hidden');
+    }, 3500);
+    return;
+  }
 
   stopFireworks();
   fireworksLayer.classList.remove('hidden');
