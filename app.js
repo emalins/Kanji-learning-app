@@ -61,6 +61,7 @@ let index = 0;
 let customFiles = loadCustomFiles();
 let mode = localStorage.getItem(MODE_KEY) || 'browse';
 let quizRange = loadQuizRange();
+const STUDY_PAGE_STEP = 20;
 let quizOrder = [];
 let quizCursor = 0;
 let quizResults = [];
@@ -255,7 +256,7 @@ function populateRangeSelect() {
 
 function syncModeUi() {
   modeToggle.checked = mode === 'quiz';
-  rangeWrap.classList.toggle('hidden', mode !== 'quiz');
+  rangeWrap.classList.remove('hidden');
 }
 
 function setMode(nextMode) {
@@ -287,7 +288,9 @@ function formatQuizReadings(row) {
   if (!row) return '';
   const onReading = (row[3] || '').trim();
   const kunReading = (row[4] || '').trim();
-  const readings = [onReading, kunReading].filter(Boolean);
+  const readings = [];
+  if (onReading) readings.push(`On: ${onReading}`);
+  if (kunReading) readings.push(`Kun: ${kunReading}`);
   return readings.length ? `(${readings.join(', ')})` : '';
 }
 
@@ -305,6 +308,51 @@ function setQuizReadings(row) {
 function clearQuizReadings() {
   quizReadings.textContent = '';
   quizReadings.classList.add('hidden');
+}
+
+function currentBrowseWindowSize() {
+  return STUDY_PAGE_STEP;
+}
+
+function saveAndApplyRange(start, end) {
+  quizRange = { start, end };
+  saveQuizRange(quizRange);
+  rangeSelect.value = `${quizRange.start}:${quizRange.end}`;
+}
+
+function moveBrowse(direction) {
+  if (!rows.length) return;
+
+  const windowSize = currentBrowseWindowSize();
+
+  if (direction > 0) {
+    if (index < quizRange.end - 1) {
+      index = Math.min(index + 1, rows.length - 1);
+      return;
+    }
+
+    if (quizRange.end >= rows.length) return;
+
+    const nextStart = quizRange.end;
+    const nextEnd = Math.min(nextStart + windowSize, rows.length);
+    saveAndApplyRange(nextStart, nextEnd);
+    index = nextStart;
+    return;
+  }
+
+  if (direction < 0) {
+    if (index > quizRange.start) {
+      index = Math.max(index - 1, 0);
+      return;
+    }
+
+    if (quizRange.start <= 0) return;
+
+    const prevEnd = quizRange.start;
+    const prevStart = Math.max(0, prevEnd - windowSize);
+    saveAndApplyRange(prevStart, prevEnd);
+    index = Math.max(prevEnd - 1, prevStart);
+  }
 }
 
 function shuffle(array) {
@@ -407,25 +455,27 @@ function renderBrowse() {
   quizFeedback.textContent = '';
   quizInput.value = '';
   stopFireworks();
-  fireworksLayer?.classList?.add('hidden');
+  fireworksLayer?.classList.add('hidden');
   quizInput.classList.remove('hidden');
   continueQuizBtn.classList.add('hidden');
   restartQuizBtn.classList.add('hidden');
-  clearQuizReadings();
 
   kanjiEl.textContent = hasRows ? (row[1] || '—') : '—';
   if (hasRows) {
+    setQuizReadings(row);
     meaningValue.textContent = row[2] || '';
     exampleValue.textContent = row[5] || '';
     exampleReadingValue.textContent = row[6] || '';
     exampleMeaningValue.textContent = row[7] || '';
   } else {
+    clearQuizReadings();
     meaningValue.textContent = '';
     exampleValue.textContent = '';
     exampleReadingValue.textContent = '';
     exampleMeaningValue.textContent = '';
   }
 }
+
 
 function renderQuizQuestion() {
   const row = currentQuizRow();
@@ -619,9 +669,9 @@ function loadCurrentFile(fileId, persist = true) {
 
   return loadText.then((text) => {
     rows = parseTsv(text);
-    index = 0;
     currentFileStats = getCurrentFileStats();
     populateRangeSelect();
+    index = mode === 'browse' ? quizRange.start : 0;
     if (mode === 'quiz') buildQuizOrder();
     showError('');
     if (persist) saveCurrentSelection(selected.id);
@@ -788,7 +838,6 @@ async function initialize() {
 function handleFileUpload(file) {
   return file.text().then((text) => {
     rows = parseTsv(text);
-    index = 0;
     const customId = `custom:${file.name}`;
     const existing = customFiles.findIndex((entry) => entry.name === file.name);
     const payload = { name: file.name, content: text };
@@ -806,6 +855,7 @@ function handleFileUpload(file) {
     saveCurrentSelection(customId);
     populateSelect();
     populateRangeSelect();
+    index = mode === 'browse' ? quizRange.start : 0;
     storedSelect.value = customId;
     if (mode === 'quiz') buildQuizOrder();
     showError('');
@@ -827,8 +877,10 @@ rangeSelect.addEventListener('change', () => {
   const start = parseInt(startRaw, 10);
   const end = parseInt(endRaw, 10);
   if (Number.isFinite(start) && Number.isFinite(end) && end > start) {
-    quizRange = { start, end };
-    saveQuizRange(quizRange);
+    saveAndApplyRange(start, end);
+    if (mode === 'browse') {
+      index = quizRange.start;
+    }
   }
   if (mode === 'quiz') buildQuizOrder();
   render();
@@ -840,11 +892,19 @@ fileInput.addEventListener('change', (event) => {
   event.target.value = '';
 });
 prevBtn.addEventListener('click', () => {
-  if (index > 0) index -= 1;
+  if (mode === 'browse') {
+    moveBrowse(-1);
+  } else if (index > 0) {
+    index -= 1;
+  }
   render();
 });
 nextBtn.addEventListener('click', () => {
-  if (index < rows.length - 1) index += 1;
+  if (mode === 'browse') {
+    moveBrowse(1);
+  } else if (index < rows.length - 1) {
+    index += 1;
+  }
   render();
 });
 quizInput.addEventListener('keydown', (event) => {
