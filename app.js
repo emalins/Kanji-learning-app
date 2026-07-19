@@ -204,16 +204,67 @@ function parseTsv(text) {
   return parsed.slice(1);
 }
 
+const TSV_CACHE_NAME = 'kanji-tsv-reader-data-v15';
+
+function builtinCacheKey(path) {
+  return `./__offline_cache__/builtin/${encodeURIComponent(path)}`;
+}
+
+function customCacheKey(name) {
+  return `./__offline_cache__/custom/${encodeURIComponent(name)}`;
+}
+
+async function openTsvCache() {
+  return caches.open(TSV_CACHE_NAME);
+}
+
+async function cacheText(key, text) {
+  const cache = await openTsvCache();
+  await cache.put(new Request(key), new Response(text, {
+    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+  }));
+}
+
+async function readCachedText(key) {
+  const cache = await openTsvCache();
+  const response = await cache.match(new Request(key));
+  return response ? await response.text() : null;
+}
+
 async function fetchText(path) {
+  const cached = await readCachedText(builtinCacheKey(path));
+  if (cached !== null) return cached;
+
   const response = await fetch(path, { cache: 'no-store' });
   if (!response.ok) throw new Error(`Failed to load ${path}`);
-  return response.text();
+  const text = await response.text();
+  await cacheText(builtinCacheKey(path), text);
+  return text;
 }
 
 async function loadDataIndex() {
   const text = await fetchText('data-index.json');
   const parsed = JSON.parse(text);
   return Array.isArray(parsed.files) ? parsed.files : [];
+}
+
+async function warmCustomFileCache(files) {
+  await Promise.all(files.map(async (file) => {
+    if (file && typeof file.name === 'string' && typeof file.content === 'string') {
+      await cacheText(customCacheKey(file.name), file.content);
+    }
+  }));
+}
+
+async function loadCustomFileText(file) {
+  const key = customCacheKey(file.name);
+  const cached = await readCachedText(key);
+  if (cached !== null) return cached;
+  if (typeof file.content === 'string') {
+    await cacheText(key, file.content);
+    return file.content;
+  }
+  throw new Error(`Missing offline copy for ${file.name}`);
 }
 
 function getAllFiles() {
@@ -383,13 +434,7 @@ function stopFireworks() {
 function startPerfectScoreFireworks() {
   if (fireworksCelebrated || !fireworksLayer || typeof window === 'undefined') return;
   const FireworksCtor = window.Fireworks?.default || window.Fireworks;
-  if (typeof FireworksCtor !== 'function') {
-    fireworksCelebrated = true;
-    window.setTimeout(() => {
-      fireworksLayer.classList.add('hidden');
-    }, 3500);
-    return;
-  }
+  if (typeof FireworksCtor !== 'function') return;
 
   stopFireworks();
   fireworksLayer.classList.remove('hidden');
@@ -671,7 +716,7 @@ function loadCurrentFile(fileId, persist = true) {
 
   const loadText = selected.source === 'builtin'
     ? fetchText(selected.path)
-    : Promise.resolve(selected.content);
+    : loadCustomFileText(selected);
 
   return loadText.then((text) => {
     rows = parseTsv(text);
@@ -836,13 +881,14 @@ async function initialize() {
     builtinFiles = fallbackBuiltinFiles();
   }
 
+  await warmCustomFileCache(customFiles);
   populateSelect();
   populateRangeSelect();
   await setInitialFileSelection();
 }
 
 function handleFileUpload(file) {
-  return file.text().then((text) => {
+  return file.text().then(async (text) => {
     rows = parseTsv(text);
     const customId = `custom:${file.name}`;
     const existing = customFiles.findIndex((entry) => entry.name === file.name);
@@ -850,6 +896,7 @@ function handleFileUpload(file) {
     if (existing >= 0) customFiles[existing] = payload;
     else customFiles = [...customFiles, payload];
     saveCustomFiles(customFiles);
+    await cacheText(customCacheKey(file.name), text);
     currentFileId = customId;
     currentSource = customId;
     currentLabel = `Added file: ${file.name}`;
