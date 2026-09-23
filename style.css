@@ -400,6 +400,49 @@ h1{
 .btn.primary{background:var(--primary);color:#fff}
 .btn.secondary{background:var(--secondary);color:var(--text)}
 
+.etymology-box{
+  width:100%;
+  max-width:760px;
+  margin:12px auto 0;
+  padding:14px 16px;
+  border-radius:18px;
+  background:var(--card);
+  border:1px solid var(--border);
+  text-align:left;
+}
+.etymology-box span{
+  display:block;
+  font-size:.75rem;
+  text-transform:uppercase;
+  letter-spacing:.18em;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+.etymology-box strong{
+  display:block;
+  font-size:.98rem;
+  font-weight:500;
+  line-height:1.6;
+  word-break:break-word;
+}
+.etymology-toggle-wrap{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:.9rem;
+  font-weight:600;
+  color:var(--muted);
+  cursor:pointer;
+  user-select:none;
+  padding:8px 4px;
+}
+.etymology-toggle-wrap input{
+  width:16px;
+  height:16px;
+  cursor:pointer;
+  accent-color:var(--primary);
+}
+
 @media (max-width:640px){
   .panel,.card{border-radius:20px}
   .status-row{flex-direction:column}

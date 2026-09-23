@@ -40,6 +40,11 @@
           <select id="rangeSelect"></select>
         </label>
 
+        <label id="etymologyToggleWrap" class="etymology-toggle-wrap hidden">
+          <input id="etymologyToggle" type="checkbox" />
+          <span>Show Etymology</span>
+        </label>
+
         <div class="settings-wrap">
           <button id="statsBtn" class="btn secondary stats-btn hidden" type="button">Statistics</button>
           <label id="addTsvWrap" class="file-button hidden">
@@ -67,11 +72,17 @@
       <div id="kanji" class="kanji">—</div>
       <div id="quizReadings" class="quiz-readings hidden"></div>
 
-      <div id="browseDetails" class="details hidden">
-        <div><span>Meaning</span><strong id="meaningValue"></strong></div>
-        <div><span>Example Word</span><strong id="exampleValue"></strong></div>
-        <div><span>Example Reading</span><strong id="exampleReadingValue"></strong></div>
-        <div><span>Example Meaning</span><strong id="exampleMeaningValue"></strong></div>
+      <div id="browseDetails" class="hidden">
+        <div class="details">
+          <div><span>Meaning</span><strong id="meaningValue"></strong></div>
+          <div><span>Example Word</span><strong id="exampleValue"></strong></div>
+          <div><span>Example Reading</span><strong id="exampleReadingValue"></strong></div>
+          <div><span>Example Meaning</span><strong id="exampleMeaningValue"></strong></div>
+        </div>
+        <div id="etymologyBox" class="etymology-box hidden">
+          <span>Etymology</span>
+          <strong id="etymologyValue"></strong>
+        </div>
       </div>
 
       <div id="quizArea" class="quiz-area hidden">

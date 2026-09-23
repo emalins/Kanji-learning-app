@@ -38,12 +38,18 @@ const navControls = document.getElementById('navControls');
 const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
 
+const etymologyToggle = document.getElementById('etymologyToggle');
+const etymologyToggleWrap = document.getElementById('etymologyToggleWrap');
+const etymologyBox = document.getElementById('etymologyBox');
+const etymologyValue = document.getElementById('etymologyValue');
+
 const CURRENT_FILE_KEY = 'kanji_current_file';
 const CUSTOM_FILES_KEY = 'kanji_custom_files';
 const MODE_KEY = 'kanji_mode';
 const QUIZ_RANGE_KEY = 'kanji_quiz_range';
 const SETTINGS_OPEN_KEY = 'kanji_settings_open';
 const QUIZ_STATS_KEY = 'kanji_quiz_stats';
+const ETYMOLOGY_KEY = 'kanji_show_etymology';
 
 const BUILTIN_FALLBACK = [
   { source: 'builtin', id: 'builtin:data/N5_v1.0.tsv', label: 'N5', name: 'N5_v1.0.tsv', path: 'data/N5_v1.0.tsv' },
@@ -70,6 +76,8 @@ let showStatistics = false;
 let fireworksInstance = null;
 let fireworksCelebrated = false;
 let settingsOpen = localStorage.getItem(SETTINGS_OPEN_KEY) === '1';
+let showEtymology = localStorage.getItem(ETYMOLOGY_KEY) === '1';
+let etymologyColIndex = -1;
 let presentedRecorded = false;
 
 function fallbackBuiltinFiles() {
@@ -201,10 +209,19 @@ function parseTsv(text) {
   const parsed = lines.map((line) => line.split('\t'));
   const header = parsed[0].map((cell) => cell.trim());
   if (header[0] !== 'ID') throw new Error('This app expects a TSV whose first column header is ID.');
+  etymologyColIndex = header.indexOf('Etymology');
+  if (etymologyColIndex >= 0) {
+    showEtymology = true;
+    localStorage.setItem(ETYMOLOGY_KEY, '1');
+    etymologyToggle.checked = true;
+  } else {
+    showEtymology = false;
+    etymologyToggle.checked = false;
+  }
   return parsed.slice(1);
 }
 
-const TSV_CACHE_NAME = 'kanji-tsv-reader-data-v15';
+const TSV_CACHE_NAME = 'kanji-tsv-reader-data-v19';
 
 function builtinCacheKey(path) {
   return `./__offline_cache__/builtin/${encodeURIComponent(path)}`;
@@ -518,13 +535,19 @@ function renderBrowse() {
     exampleValue.textContent = row[5] || '';
     exampleReadingValue.textContent = row[6] || '';
     exampleMeaningValue.textContent = row[7] || '';
+    const etymText = (etymologyColIndex >= 0 ? row[etymologyColIndex] : '') || '';
+    etymologyValue.textContent = etymText;
+    etymologyBox.classList.toggle('hidden', !showEtymology || !etymText);
   } else {
     clearQuizReadings();
     meaningValue.textContent = '';
     exampleValue.textContent = '';
     exampleReadingValue.textContent = '';
     exampleMeaningValue.textContent = '';
+    etymologyValue.textContent = '';
+    etymologyBox.classList.add('hidden');
   }
+  etymologyToggle.checked = showEtymology;
 }
 
 
@@ -845,6 +868,13 @@ function toggleSettings() {
   settingsOpen = !settingsOpen;
   localStorage.setItem(SETTINGS_OPEN_KEY, settingsOpen ? '1' : '0');
   addTsvWrap.classList.toggle('hidden', !settingsOpen);
+  etymologyToggleWrap.classList.toggle('hidden', !settingsOpen);
+}
+
+function toggleEtymology() {
+  showEtymology = etymologyToggle.checked;
+  localStorage.setItem(ETYMOLOGY_KEY, showEtymology ? '1' : '0');
+  render();
 }
 
 function setInitialFileSelection() {
@@ -865,7 +895,11 @@ async function initialize() {
   populateSelect();
   populateRangeSelect();
   syncModeUi();
-  if (settingsOpen) addTsvWrap.classList.remove('hidden');
+  if (settingsOpen) {
+    addTsvWrap.classList.remove('hidden');
+    etymologyToggleWrap.classList.remove('hidden');
+  }
+  etymologyToggle.checked = showEtymology;
   statsBtn.classList.add('hidden');
 
   try {
@@ -922,6 +956,7 @@ function handleFileUpload(file) {
 }
 
 settingsBtn.addEventListener('click', toggleSettings);
+etymologyToggle.addEventListener('change', toggleEtymology);
 statsBtn.addEventListener('click', toggleStatistics);
 modeToggle.addEventListener('change', () => setMode(modeToggle.checked ? 'quiz' : 'browse'));
 storedSelect.addEventListener('change', (e) => loadCurrentFile(e.target.value, true));
